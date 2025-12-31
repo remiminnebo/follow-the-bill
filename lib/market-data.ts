@@ -1,13 +1,9 @@
-import yahooFinance from 'yahoo-finance2';
+import YahooFinance from 'yahoo-finance2';
 
-// Tickers from Strategy Deep Dive
-export const STRATEGY_TICKERS = [
-  'MSFT', 'GOOGL', 'AMZN', 'META', // Level 1: AI & Cloud
-  'NVDA', 'TSM', 'AMD', 'AVGO', 'ASML', // Level 2: Semiconductors
-  'EQIX', 'DLR', 'VRT', 'SBGSY', // Level 3: Infrastructure
-  'VST', 'CEG', 'NRG', 'NEE', // Level 4: Energy
-  'CCJ', 'KAP.L', 'MP', 'FCX' // Level 5: Resources
-];
+// Create a singleton instance for v3
+const yf = new (YahooFinance as any)({
+  suppressNotices: ['yahooSurvey']
+});
 
 export interface StockPerformance {
   symbol: string;
@@ -36,13 +32,18 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
   }
 
   try {
-    const result = await yahooFinance.historical(symbol, {
+    const result = await yf.historical(symbol, {
       period1: start,
       period2: end,
       interval: '1d',
     }) as any[];
 
-    const quote = await yahooFinance.quote(symbol) as any;
+    const quote = await yf.quote(symbol) as any;
+
+    if (!quote || !result) {
+      console.error(`Empty data received for ${symbol}`);
+      return null;
+    }
 
     return {
       symbol,
@@ -61,7 +62,15 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
   const results = await Promise.all(promises);
   const validResults = results.filter((r): r is StockPerformance => r !== null);
 
-  if (validResults.length === 0) return null;
+  if (validResults.length === 0) {
+    return {
+      tickers: [],
+      history: [],
+      currentValue: 100,
+      startValue: 100,
+      totalChange: 0
+    };
+  }
 
   // Normalize history data to index 100 starting at 'start'
   const aggregateMap: Map<string, number> = new Map();
