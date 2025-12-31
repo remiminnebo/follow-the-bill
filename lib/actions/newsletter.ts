@@ -3,6 +3,8 @@
 import { prisma } from "@/lib/db";
 import { newsletterSchema } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
+import { resend } from "@/lib/resend";
+import { WelcomeEmail } from "@/components/emails/welcome-template";
 
 export async function subscribeToNewsletter(formData: FormData) {
     const email = formData.get("email") as string;
@@ -29,6 +31,15 @@ export async function subscribeToNewsletter(formData: FormData) {
                     where: { id: existingSubscriber.id },
                     data: { isActive: true },
                 });
+
+                // Send welcome email (again)
+                await resend.emails.send({
+                    from: 'Follow The Bill <onboarding@resend.dev>', // Update this with your verified domain
+                    to: result.data.email,
+                    subject: 'Welcome back to Follow The Bill',
+                    react: WelcomeEmail({ email: result.data.email }),
+                });
+
                 return {
                     success: true,
                     message: "Welcome back! You've been resubscribed.",
@@ -43,6 +54,14 @@ export async function subscribeToNewsletter(formData: FormData) {
             data: {
                 email: result.data.email,
             },
+        });
+
+        // Send welcome email
+        await resend.emails.send({
+            from: 'Follow The Bill <onboarding@resend.dev>', // Update this with your verified domain
+            to: result.data.email,
+            subject: 'Welcome to Follow The Bill',
+            react: WelcomeEmail({ email: result.data.email }),
         });
 
         revalidatePath("/");
