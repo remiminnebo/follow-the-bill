@@ -5,6 +5,15 @@ const yf = new (YahooFinance as any)({
   suppressNotices: ['yahooSurvey']
 });
 
+// Tickers from Strategy Deep Dive
+export const STRATEGY_TICKERS = [
+  'MSFT', 'GOOGL', 'AMZN', 'META', // Level 1: AI & Cloud
+  'NVDA', 'TSM', 'AMD', 'AVGO', 'ASML', // Level 2: Semiconductors
+  'EQIX', 'DLR', 'VRT', 'SBGSY', // Level 3: Infrastructure
+  'VST', 'CEG', 'NRG', 'NEE', // Level 4: Energy
+  'CCJ', 'KAP.L', 'MP', 'FCX' // Level 5: Resources
+];
+
 export interface StockPerformance {
   symbol: string;
   currentPrice: number;
