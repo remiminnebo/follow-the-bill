@@ -26,22 +26,32 @@ export function PerformanceChart() {
   const [range, setRange] = useState<'YTD' | '1Y' | '2Y' | '3Y'>('YTD');
   const [data, setData] = useState<PerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setError(null);
+      console.log(`Fetching performance data for range: ${range}`);
       try {
         const response = await fetch(`/api/market-performance?range=${range}`);
         const result = await response.json();
+        
         if (response.ok && !result.error) {
-          setData(result);
+          if (result.tickers && result.tickers.length > 0) {
+            setData(result);
+          } else {
+            console.warn("API returned empty ticker list");
+            setData(result); 
+          }
         } else {
-          console.error("API error:", result.error);
-          setData(null);
+          const errorMsg = result.error || "Unknown API error";
+          console.error("API error:", errorMsg);
+          setError(errorMsg);
         }
-      } catch (error) {
-        console.error("Failed to fetch performance data", error);
-        setData(null);
+      } catch (err: any) {
+        console.error("Failed to fetch performance data:", err.message);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -52,19 +62,38 @@ export function PerformanceChart() {
   if (loading && !data) {
     return (
       <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-white">
-        <div className="flex flex-col items-center gap-2">
-          <Activity className="animate-spin h-8 w-8 text-black" />
-          <p className="font-sans text-sm font-bold uppercase tracking-tighter">Calculating FTB Index...</p>
+        <div className="flex flex-col items-center gap-4 text-center px-4">
+          <Activity className="animate-spin h-10 w-10 text-black" />
+          <div>
+            <p className="font-sans text-sm font-black uppercase tracking-tighter">Calculating FTB Index...</p>
+            <p className="font-sans text-[10px] text-black/50 mt-1 uppercase">Fetching real-time data for 20+ constituents</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Ensure data exists and has the expected properties
-  if (!data || typeof data.currentValue !== 'number' || typeof data.totalChange !== 'number') {
+  if (error || !data || data.tickers.length === 0) {
     return (
-      <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-white">
-        <p className="font-sans text-sm font-bold uppercase tracking-tighter">Performance data currently unavailable</p>
+      <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-white p-8">
+        <div className="text-center max-w-md">
+          <TrendingDown className="h-12 w-12 mx-auto mb-4 opacity-20" />
+          <p className="font-sans text-sm font-black uppercase tracking-tighter mb-2">Performance data currently unavailable</p>
+          <p className="font-sans text-xs text-black/60 uppercase mb-6">
+            We are experiencing rate-limiting from our data provider. Please try again in a few minutes or change the time horizon.
+          </p>
+          <div className="flex justify-center gap-2">
+            {(['YTD', '1Y', '2Y', '3Y'] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setRange(r)}
+                className={`px-4 py-1 font-sans text-xs font-black border-2 border-black transition-none ${range === r ? 'bg-black text-white' : 'bg-white text-black hover:invert'}`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -79,10 +108,12 @@ export function PerformanceChart() {
             <span className="font-sans text-xs font-bold uppercase tracking-widest">FTB Aggregate Index</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="font-serif text-4xl font-black italic">{data.currentValue.toFixed(2)}</span>
+            <span className="font-serif text-4xl font-black italic">
+              {typeof data.currentValue === 'number' ? data.currentValue.toFixed(2) : "0.00"}
+            </span>
             <span className="font-sans text-lg font-bold flex items-center text-black border-2 border-black px-2 py-0.5 ml-2">
               {data.totalChange >= 0 ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
-              {data.totalChange.toFixed(2)}%
+              {typeof data.totalChange === 'number' ? data.totalChange.toFixed(2) : "0.00"}%
             </span>
           </div>
         </div>

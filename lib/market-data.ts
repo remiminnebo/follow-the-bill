@@ -1,9 +1,18 @@
 import YahooFinance from 'yahoo-finance2';
 
-// Create a singleton instance for v3
+// Create a singleton instance for v3 with specific configuration to avoid rate limits
 const yf = new (YahooFinance as any)({
-  suppressNotices: ['yahooSurvey']
+  suppressNotices: ['yahooSurvey'],
+  queue: {
+    concurrency: 2, // Limit concurrent requests to avoid 429 "Too Many Requests"
+    timeout: 10000
+  }
 });
+
+// Setting a common User-Agent can help with Yahoo's crumb/rate-limiting issues
+if ((yf as any)._env) {
+  (yf as any)._env.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
+}
 
 // Tickers from Strategy Deep Dive
 export const STRATEGY_TICKERS = [
@@ -41,37 +50,45 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
   }
 
   try {
+    // Attempt to get historical data
     const result = await yf.historical(symbol, {
       period1: start,
       period2: end,
       interval: '1d',
     }) as any[];
 
+    // Attempt to get current quote
     const quote = await yf.quote(symbol) as any;
 
-    if (!quote || !result) {
-      console.error(`Empty data received for ${symbol}`);
+    if (!quote || !result || result.length === 0) {
+      console.warn(`No data for ${symbol} - Quote: ${!!quote}, History: ${result?.length || 0} points`);
       return null;
     }
 
     return {
       symbol,
-      currentPrice: quote.regularMarketPrice || 0,
-      changePercent: quote.regularMarketChangePercent || 0,
+      currentPrice: quote.regularMarketPrice || quote.price || 0,
+      changePercent: quote.regularMarketChangePercent || quote.changePercent || 0,
       history: result.map(d => ({ date: d.date, close: d.close })),
     };
-  } catch (error) {
-    console.error(`Error fetching data for ${symbol}:`, error);
+  } catch (error: any) {
+    console.error(`Error fetching data for ${symbol}: ${error.message}`);
     return null;
   }
 }
 
 export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y') {
+  console.log(`Starting aggregate performance fetch for range: ${range}`);
+  
+  // Fetch data for all tickers
   const promises = STRATEGY_TICKERS.map(ticker => getStockData(ticker, range));
   const results = await Promise.all(promises);
   const validResults = results.filter((r): r is StockPerformance => r !== null);
 
+  console.log(`Successfully fetched ${validResults.length}/${STRATEGY_TICKERS.length} tickers`);
+
   if (validResults.length === 0) {
+    console.error("All ticker fetches failed. Returning default state.");
     return {
       tickers: [],
       history: [],
@@ -85,9 +102,26 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
   const aggregateMap: Map<string, number> = new Map();
   const dateCounts: Map<string, number> = new Map();
 
-  validResults.forEach(stock => {
-    if (stock.history.length === 0) return;
+  const stocksWithHistory = validResults.filter(s => s.history && s.history.length > 0);
+  
+  if (stocksWithHistory.length === 0) {
+    console.error("No stocks with history found.");
+    return {
+      tickers: validResults.map(r => ({
+        symbol: r.symbol,
+        price: r.currentPrice,
+        change: r.changePercent
+      })),
+      history: [],
+      currentValue: 100,
+      startValue: 100,
+      totalChange: 0
+    };
+  }
+
+  stocksWithHistory.forEach(stock => {
     const initialPrice = stock.history[0].close;
+    if (!initialPrice || initialPrice === 0) return;
     
     stock.history.forEach(day => {
       const dateStr = day.date.toISOString().split('T')[0];
@@ -104,6 +138,20 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
       value: total / (dateCounts.get(date) || 1)
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (aggregateHistory.length === 0) {
+    return {
+      tickers: validResults.map(r => ({
+        symbol: r.symbol,
+        price: r.currentPrice,
+        change: r.changePercent
+      })),
+      history: [],
+      currentValue: 100,
+      startValue: 100,
+      totalChange: 0
+    };
+  }
 
   return {
     tickers: validResults.map(r => ({
