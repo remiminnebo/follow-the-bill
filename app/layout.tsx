@@ -19,6 +19,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ftb.minnebo.ai"),
   title: {
     default: "Follow The Bill | Strategic Investment Tracking",
     template: "%s | Follow The Bill",
@@ -39,7 +40,15 @@ export const metadata: Metadata = {
     title: "Follow The Bill | Strategic Investment Tracking",
     description:
       "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem.",
-    url: "https://followthebill.com",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 800,
+        height: 800,
+        alt: "Follow The Bill",
+      },
+    ],
+    url: "https://ftb.minnebo.ai",
     siteName: "Follow The Bill",
     locale: "en_US",
     type: "website",
@@ -49,6 +58,7 @@ export const metadata: Metadata = {
     title: "Follow The Bill | Strategic Investment Tracking",
     description:
       "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
