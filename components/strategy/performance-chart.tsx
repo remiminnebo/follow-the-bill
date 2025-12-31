@@ -45,10 +45,10 @@ export function PerformanceChart() {
 
   if (loading && !data) {
     return (
-      <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-gray-50">
+      <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-white">
         <div className="flex flex-col items-center gap-2">
           <Activity className="animate-spin h-8 w-8 text-black" />
-          <p className="font-sans text-sm font-bold">Calculating FTB Index...</p>
+          <p className="font-sans text-sm font-bold uppercase tracking-tighter">Calculating FTB Index...</p>
         </div>
       </div>
     );
@@ -59,13 +59,13 @@ export function PerformanceChart() {
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border-2 border-black">
         <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white">
-          <div className="flex items-center gap-2 text-black/60 mb-2">
+          <div className="flex items-center gap-2 text-black mb-2">
             <Activity className="h-4 w-4" />
-            <span className="font-sans text-xs font-bold uppercase tracking-wider">FTB Aggregate Index</span>
+            <span className="font-sans text-xs font-bold uppercase tracking-widest">FTB Aggregate Index</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="font-serif text-4xl font-bold">{data?.currentValue.toFixed(2)}</span>
-            <span className={`font-sans text-lg font-bold flex items-center ${data && data.totalChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <span className="font-serif text-4xl font-black italic">{data?.currentValue.toFixed(2)}</span>
+            <span className="font-sans text-lg font-bold flex items-center text-black border-2 border-black px-2 py-0.5 ml-2">
               {data && data.totalChange >= 0 ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
               {data?.totalChange.toFixed(2)}%
             </span>
@@ -73,16 +73,16 @@ export function PerformanceChart() {
         </div>
         
         <div className="p-6 border-b-2 md:border-b-0 md:border-r-2 border-black bg-white">
-          <div className="flex items-center gap-2 text-black/60 mb-2">
+          <div className="flex items-center gap-2 text-black mb-2">
             <Clock className="h-4 w-4" />
-            <span className="font-sans text-xs font-bold uppercase tracking-wider">Time Horizon</span>
+            <span className="font-sans text-xs font-bold uppercase tracking-widest">Time Horizon</span>
           </div>
           <div className="flex gap-2">
             {(['YTD', '1Y', '2Y', '3Y'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`px-3 py-1 font-sans text-sm font-bold border-2 border-black transition-colors ${range === r ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-100'}`}
+                className={`px-4 py-1 font-sans text-sm font-black border-2 border-black transition-none ${range === r ? 'bg-black text-white' : 'bg-white text-black hover:invert'}`}
               >
                 {r}
               </button>
@@ -91,82 +91,91 @@ export function PerformanceChart() {
         </div>
 
         <div className="p-6 bg-black text-white">
-          <div className="font-sans text-xs font-bold uppercase tracking-wider opacity-60 mb-2">Strategy Composition</div>
+          <div className="font-sans text-xs font-bold uppercase tracking-widest mb-2 opacity-70">Strategy Composition</div>
           <div className="flex flex-wrap gap-2">
             {data?.tickers.slice(0, 8).map(t => (
-              <span key={t.symbol} className="font-sans text-[10px] font-bold border border-white/30 px-1">
+              <span key={t.symbol} className="font-sans text-[10px] font-black border-2 border-white px-1.5 py-0.5">
                 {t.symbol}
               </span>
             ))}
-            <span className="font-sans text-[10px] font-bold opacity-60">+{data?.tickers.length! - 8} more</span>
+            <span className="font-sans text-[10px] font-bold underline">+{data?.tickers.length! - 8} MORE</span>
           </div>
         </div>
       </div>
 
       {/* Main Chart */}
-      <div className="border-2 border-black bg-white p-6 h-[450px]">
+      <div className="border-2 border-black bg-white p-6 h-[450px] relative">
         <div className="mb-6">
-          <h3 className="font-serif text-xl font-bold italic underline decoration-2 offset-4">Cumulative Strategy Performance</h3>
-          <p className="font-sans text-sm text-black/60">Base 100 normalization of all supply chain level constituents.</p>
+          <h3 className="font-serif text-2xl font-black uppercase italic tracking-tighter decoration-4 underline">Cumulative Strategy Performance</h3>
+          <p className="font-sans text-xs font-bold mt-1 text-black uppercase tracking-tight">Base 100 normalization / Strategy constituents index</p>
         </div>
         <div className="w-full h-[320px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data?.history}>
               <defs>
-                <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#000" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#000" stopOpacity={0}/>
-                </linearGradient>
+                <pattern id="pattern-stripe" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <rect width="2" height="4" transform="translate(0,0)" fill="black" opacity="0.1"></rect>
+                </pattern>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+              <CartesianGrid strokeDasharray="0" vertical={false} stroke="#000" strokeOpacity={0.1} />
               <XAxis 
                 dataKey="date" 
                 axisLine={{ stroke: '#000', strokeWidth: 2 }}
-                tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 'bold', fill: '#000' }}
+                tickLine={{ stroke: '#000', strokeWidth: 2 }}
+                tick={{ fontSize: 10, fontWeight: '900', fill: '#000', fontFamily: 'var(--font-sans)' }}
                 minTickGap={30}
               />
               <YAxis 
                 domain={['auto', 'auto']}
                 axisLine={{ stroke: '#000', strokeWidth: 2 }}
-                tickLine={false}
-                tick={{ fontSize: 10, fontWeight: 'bold', fill: '#000' }}
+                tickLine={{ stroke: '#000', strokeWidth: 2 }}
+                tick={{ fontSize: 10, fontWeight: '900', fill: '#000', fontFamily: 'var(--font-sans)' }}
               />
               <Tooltip 
-                contentStyle={{ border: '2px solid black', borderRadius: 0, fontFamily: 'var(--font-sans)', fontWeight: 'bold' }}
-                labelStyle={{ marginBottom: '4px' }}
+                contentStyle={{ 
+                  border: '2px solid black', 
+                  borderRadius: 0, 
+                  backgroundColor: 'white',
+                  fontFamily: 'var(--font-sans)', 
+                  fontWeight: '900',
+                  textTransform: 'uppercase'
+                }}
+                itemStyle={{ color: 'black' }}
+                cursor={{ stroke: 'black', strokeWidth: 2 }}
               />
               <Area 
-                type="monotone" 
+                type="stepAfter" 
                 dataKey="value" 
                 stroke="#000" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorValue)" 
-                animationDuration={1500}
+                strokeWidth={4}
+                fill="url(#pattern-stripe)" 
+                fillOpacity={1}
+                animationDuration={0}
               />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Constituent Table Snippet */}
-      <div className="border-2 border-black overflow-hidden">
-        <table className="w-full text-left font-sans text-sm">
+      {/* Constituent Table */}
+      <div className="border-2 border-black overflow-hidden bg-white">
+        <table className="w-full text-left font-sans text-sm border-collapse">
           <thead>
-            <tr className="bg-black text-white uppercase text-[10px] tracking-widest font-bold">
-              <th className="p-3">Ticker</th>
-              <th className="p-3">Price</th>
-              <th className="p-3 text-right">Daily Change</th>
+            <tr className="bg-black text-white uppercase text-[11px] tracking-[0.2em] font-black">
+              <th className="p-4 border-r border-white/20">Ticker</th>
+              <th className="p-4 border-r border-white/20">Price</th>
+              <th className="p-4 text-right">Daily Change</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-black/10">
-            {data?.tickers.slice(0, 5).map(t => (
-              <tr key={t.symbol} className="hover:bg-gray-50">
-                <td className="p-3 font-bold">{t.symbol}</td>
-                <td className="p-3 font-mono">${t.price.toFixed(2)}</td>
-                <td className={`p-3 text-right font-bold ${t.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {t.change >= 0 ? '+' : ''}{t.change.toFixed(2)}%
+          <tbody className="divide-y-2 divide-black">
+            {data?.tickers.slice(0, 10).map(t => (
+              <tr key={t.symbol} className="hover:bg-black hover:text-white group transition-none">
+                <td className="p-4 font-black border-r-2 border-black group-hover:border-white">{t.symbol}</td>
+                <td className="p-4 font-black border-r-2 border-black group-hover:border-white">${t.price.toFixed(2)}</td>
+                <td className="p-4 text-right font-black">
+                  <span className={`inline-block px-2 py-0.5 border-2 border-black group-hover:border-white`}>
+                    {t.change >= 0 ? '+' : ''}{t.change.toFixed(2)}%
+                  </span>
                 </td>
               </tr>
             ))}
