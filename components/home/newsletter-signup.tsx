@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { subscribeToNewsletter } from "@/lib/actions/newsletter";
 
 export function NewsletterSignup() {
     const [email, setEmail] = useState("");
@@ -13,14 +14,20 @@ export function NewsletterSignup() {
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const formData = new FormData();
+        formData.append("email", email);
 
-        toast.success("Successfully subscribed!", {
-            description: "You'll receive our next monthly report in your inbox.",
-        });
+        const result = await subscribeToNewsletter(formData);
 
-        setEmail("");
+        if (result.error) {
+            toast.error(result.error);
+        } else {
+            toast.success(result.message || "Successfully subscribed!", {
+                description: "You'll receive our next monthly report in your inbox.",
+            });
+            setEmail("");
+        }
+
         setIsLoading(false);
     };
 
@@ -36,6 +43,7 @@ export function NewsletterSignup() {
             <form onSubmit={handleSubmit} className="flex gap-0">
                 <Input
                     type="email"
+                    name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
