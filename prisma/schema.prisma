@@ -7,7 +7,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Enums
@@ -32,9 +31,10 @@ enum Category {
 // User model
 model User {
   id            String    @id @default(cuid())
+  clerkId       String    @unique
   email         String    @unique
-  name          String
-  password      String
+  name          String?
+  password      String?
   role          Role      @default(USER)
   emailVerified DateTime?
   image         String?
