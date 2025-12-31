@@ -33,9 +33,15 @@ export function PerformanceChart() {
       try {
         const response = await fetch(`/api/market-performance?range=${range}`);
         const result = await response.json();
-        setData(result);
+        if (response.ok && !result.error) {
+          setData(result);
+        } else {
+          console.error("API error:", result.error);
+          setData(null);
+        }
       } catch (error) {
         console.error("Failed to fetch performance data", error);
+        setData(null);
       } finally {
         setLoading(false);
       }
@@ -54,10 +60,11 @@ export function PerformanceChart() {
     );
   }
 
-  if (!data) {
+  // Ensure data exists and has the expected properties
+  if (!data || typeof data.currentValue !== 'number' || typeof data.totalChange !== 'number') {
     return (
       <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-white">
-        <p className="font-sans text-sm font-bold uppercase tracking-tighter">Performance data unavailable</p>
+        <p className="font-sans text-sm font-bold uppercase tracking-tighter">Performance data currently unavailable</p>
       </div>
     );
   }
