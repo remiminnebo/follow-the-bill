@@ -1,26 +1,202 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* =============================================
+   FOLLOW THE BILL - BRUTALIST DESIGN SYSTEM
+   Colors: Pure Black (#000000) and White (#FFFFFF) only
+   Typography: Playfair Display (serif) + Inter (sans-serif)
+   ============================================= */
 
 @theme inline {
+  /* Font families */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  
+  /* Colors - Pure black and white ONLY */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  /* Radius - Sharp corners (brutalist) */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  /* STRICT BLACK AND WHITE */
+  --radius: 0;
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #ffffff;
+  --secondary-foreground: #000000;
+  --muted: #ffffff;
+  --muted-foreground: rgba(0, 0, 0, 0.6);
+  --accent: #ffffff;
+  --accent-foreground: #000000;
+  --destructive: #000000;
+  --border: #000000;
+  --input: #000000;
+  --ring: #000000;
+}
+
+.dark {
+  /* Dark mode - inverted but still black/white */
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #000000;
+  --card-foreground: #ffffff;
+  --popover: #000000;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #000000;
+  --secondary-foreground: #ffffff;
+  --muted: #000000;
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --accent: #000000;
+  --accent-foreground: #ffffff;
+  --destructive: #ffffff;
+  --border: #ffffff;
+  --input: #ffffff;
+  --ring: #ffffff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  /* Typography hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+  
+  p, span, div {
+    @apply font-sans;
+  }
+  
+  a {
+    @apply underline-offset-4 hover:underline;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Brutalist button styles */
+  .btn-primary {
+    @apply bg-black text-white border-2 border-black px-6 py-3 font-sans font-medium 
+           transition-colors duration-200
+           hover:bg-white hover:text-black;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-black border-2 border-black px-6 py-3 font-sans font-medium 
+           transition-colors duration-200
+           hover:bg-black hover:text-white;
+  }
+  
+  /* Brutalist card */
+  .card-brutalist {
+    @apply bg-white border-2 border-black p-6;
+  }
+  
+  /* Brutalist input */
+  .input-brutalist {
+    @apply bg-white border-2 border-black px-4 py-3 font-sans w-full
+           focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2;
+  }
+  
+  /* Section container */
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Page section */
+  .page-section {
+    @apply py-16 md:py-24;
+  }
+  
+  /* Divider */
+  .divider {
+    @apply border-t-2 border-black my-8;
+  }
+}
+
+@layer utilities {
+  /* Text opacity utilities for the monochrome design */
+  .text-muted-custom {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  
+  .dark .text-muted-custom {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }

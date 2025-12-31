@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  USER
+  SUBSCRIBER
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+enum Category {
+  MARKET_ANALYSIS
+  STRATEGY
+  RESOURCES
+  GENERAL
+}
+
+// User model
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          Role      @default(USER)
+  emailVerified DateTime?
+  image         String?
+  
+  // Relations
+  subscription  Subscription?
+  posts         Post[]
+  comments      Comment[]
+  votes         Vote[]
+  downloads     Download[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Subscription model
+model Subscription {
+  id        String           @id @default(cuid())
+  tier      SubscriptionTier @default(FREE)
+  startDate DateTime         @default(now())
+  endDate   DateTime?
+  
+  // Relations
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String           @unique
+  
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+// Report model
+model Report {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  fileUrl     String
+  category    String   @default("Market Analysis")
+  isFree      Boolean  @default(false)
+  publishedAt DateTime
+  
+  // Relations
+  downloads   Download[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Download tracking
+model Download {
+  id        String   @id @default(cuid())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId  String
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, reportId])
+}
+
+// Forum Post model
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  category  Category
+  upvotes   Int       @default(0)
+  isPinned  Boolean   @default(false)
+  isLocked  Boolean   @default(false)
+  
+  // Relations
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  comments  Comment[]
+  votes     Vote[]
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Comment model
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  upvotes   Int      @default(0)
+  
+  // Relations
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  
+  // Self-referencing for nested comments
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
+  parentId  String?
+  replies   Comment[] @relation("CommentReplies")
+  
+  votes     Vote[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Vote model (for upvotes/downvotes)
+model Vote {
+  id        String   @id @default(cuid())
+  value     Int      // 1 for upvote, -1 for downvote
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  
+  // Polymorphic relation to Post or Comment
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+}
+
+// Newsletter Subscription
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
