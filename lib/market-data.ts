@@ -33,7 +33,22 @@ export interface StockPerformance {
 
 const CACHE_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
 
+async function fetchWithRetry(fn: () => Promise<any>, retries = 3, delay = 2000): Promise<any> {
+  try {
+    return await fn();
+  } catch (error: any) {
+    if (retries > 0 && (error.message.includes('429') || error.message.includes('Too Many Requests') || error.message.includes('crumb'))) {
+      console.warn(`Rate limited. Retrying in ${delay}ms... (${retries} retries left)`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchWithRetry(fn, retries - 1, delay * 2);
+    }
+    throw error;
+  }
+}
+
 export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | '3Y'): Promise<StockPerformance | null> {
+  let cachedData: any = null;
+
   // 1. Check DB Cache
   try {
     const cached = await prisma.marketCache.findUnique({
@@ -43,14 +58,14 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
     });
 
     if (cached) {
+      cachedData = cached.data;
       const age = Date.now() - new Date(cached.updatedAt).getTime();
       if (age < CACHE_TTL_MS) {
         // Cache hit and fresh
-        const data = cached.data as any;
         // Restore Date objects from strings
         return {
-          ...data,
-          history: data.history.map((h: any) => ({
+          ...cachedData,
+          history: cachedData.history.map((h: any) => ({
             ...h,
             date: new Date(h.date)
           }))
@@ -81,17 +96,18 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
   }
 
   try {
-    const result = await yf.historical(symbol, {
+    // Attempt to get historical data with retry
+    const result = await fetchWithRetry(() => yf.historical(symbol, {
       period1: start,
       period2: end,
       interval: '1d',
-    }) as any[];
+    })) as any[];
 
-    const quote = await yf.quote(symbol) as any;
+    // Attempt to get current quote with retry
+    const quote = await fetchWithRetry(() => yf.quote(symbol)) as any;
 
     if (!quote || !result || result.length === 0) {
-      console.warn(`No data for ${symbol} - Quote: ${!!quote}, History: ${result?.length || 0} points`);
-      return null;
+      throw new Error(`Incomplete data from Yahoo`);
     }
 
     const performance: StockPerformance = {
@@ -124,6 +140,19 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
     return performance;
   } catch (error: any) {
     console.error(`Error fetching data for ${symbol}: ${error.message}`);
+    
+    // 4. Fallback to stale cache if fetch failed
+    if (cachedData) {
+      console.log(`Using stale cache for ${symbol} after fetch failure.`);
+      return {
+        ...cachedData,
+        history: cachedData.history.map((h: any) => ({
+          ...h,
+          date: new Date(h.date)
+        }))
+      };
+    }
+    
     return null;
   }
 }

@@ -221,10 +221,13 @@ export function PerformanceChart() {
             {data?.tickers.slice(0, 10).map(t => (
               <tr key={t.symbol} className="hover:bg-black hover:text-white group transition-none">
                 <td className="p-4 font-black border-r-2 border-black group-hover:border-white">{t.symbol}</td>
-                <td className="p-4 font-black border-r-2 border-black group-hover:border-white">${t.price.toFixed(2)}</td>
+                <td className="p-4 font-black border-r-2 border-black group-hover:border-white">
+                  ${typeof t.price === 'number' ? t.price.toFixed(2) : "0.00"}
+                </td>
                 <td className="p-4 text-right font-black">
                   <span className={`inline-block px-2 py-0.5 border-2 border-black group-hover:border-white`}>
-                    {t.change >= 0 ? '+' : ''}{t.change.toFixed(2)}%
+                    {typeof t.change === 'number' && t.change >= 0 ? '+' : ''}
+                    {typeof t.change === 'number' ? t.change.toFixed(2) : "0.00"}%
                   </span>
                 </td>
               </tr>
