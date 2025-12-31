@@ -12,7 +12,8 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { TrendingUp, TrendingDown, Clock, Activity } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Activity, Layers } from 'lucide-react';
+import { STRATEGY_CATEGORIES } from '@/lib/tickers';
 
 interface PerformanceData {
   tickers: { symbol: string; price: number; change: number }[];
@@ -28,6 +29,14 @@ export function PerformanceChart() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
+
+  // Helper to get category for a ticker
+  const getTickerCategory = (symbol: string) => {
+    for (const [category, symbols] of Object.entries(STRATEGY_CATEGORIES)) {
+      if (symbols.includes(symbol)) return category;
+    }
+    return "Other";
+  };
 
   useEffect(() => {
     setHasMounted(true);
@@ -139,14 +148,17 @@ export function PerformanceChart() {
         </div>
 
         <div className="p-6 bg-black text-white">
-          <div className="font-sans text-xs font-bold uppercase tracking-widest mb-2 opacity-70">Strategy Composition</div>
-          <div className="flex flex-wrap gap-2">
-            {data?.tickers.slice(0, 8).map(t => (
-              <span key={t.symbol} className="font-sans text-[10px] font-black border-2 border-white px-1.5 py-0.5">
-                {t.symbol}
-              </span>
+          <div className="flex items-center gap-2 mb-2 opacity-70">
+            <Layers className="h-4 w-4" />
+            <span className="font-sans text-xs font-bold uppercase tracking-widest">Strategy Composition</span>
+          </div>
+          <div className="space-y-1">
+            {Object.keys(STRATEGY_CATEGORIES).map(cat => (
+              <div key={cat} className="flex justify-between items-center text-[10px] font-black uppercase">
+                <span>{cat}</span>
+                <span>{STRATEGY_CATEGORIES[cat as keyof typeof STRATEGY_CATEGORIES].length} Assets</span>
+              </div>
             ))}
-            <span className="font-sans text-[10px] font-bold underline">+{data?.tickers.length! - 8} MORE</span>
           </div>
         </div>
       </div>
@@ -155,7 +167,7 @@ export function PerformanceChart() {
       <div className="border-2 border-black bg-white p-6 h-[450px] relative">
         <div className="mb-6">
           <h3 className="font-serif text-2xl font-black uppercase italic tracking-tighter decoration-4 underline">Cumulative Strategy Performance</h3>
-          <p className="font-sans text-xs font-bold mt-1 text-black uppercase tracking-tight">Base 100 normalization / Strategy constituents index</p>
+          <p className="font-sans text-xs font-bold mt-1 text-black uppercase tracking-tight">Base 100 normalization / {data?.tickers.length} constituents index</p>
         </div>
         <div className="w-full h-[320px]">
           {hasMounted && (
@@ -207,33 +219,49 @@ export function PerformanceChart() {
         </div>
       </div>
 
-      {/* Constituent Table */}
-      <div className="border-2 border-black overflow-hidden bg-white">
-        <table className="w-full text-left font-sans text-sm border-collapse">
-          <thead>
-            <tr className="bg-black text-white uppercase text-[11px] tracking-[0.2em] font-black">
-              <th className="p-4 border-r border-white/20">Ticker</th>
-              <th className="p-4 border-r border-white/20">Price</th>
-              <th className="p-4 text-right">Daily Change</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y-2 divide-black">
-            {data?.tickers.slice(0, 10).map(t => (
-              <tr key={t.symbol} className="hover:bg-black hover:text-white group transition-none">
-                <td className="p-4 font-black border-r-2 border-black group-hover:border-white">{t.symbol}</td>
-                <td className="p-4 font-black border-r-2 border-black group-hover:border-white">
-                  ${typeof t.price === 'number' ? t.price.toFixed(2) : "0.00"}
-                </td>
-                <td className="p-4 text-right font-black">
-                  <span className={`inline-block px-2 py-0.5 border-2 border-black group-hover:border-white`}>
-                    {typeof t.change === 'number' && t.change >= 0 ? '+' : ''}
-                    {typeof t.change === 'number' ? t.change.toFixed(2) : "0.00"}%
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Constituent Table Grouped by Category */}
+      <div className="space-y-4">
+        <h3 className="font-serif text-2xl font-black uppercase italic tracking-tight">Index Constituents</h3>
+        <div className="grid grid-cols-1 gap-6">
+          {Object.entries(STRATEGY_CATEGORIES).map(([category, symbols]) => {
+            const categoryTickers = data?.tickers.filter(t => symbols.includes(t.symbol)) || [];
+            if (categoryTickers.length === 0) return null;
+
+            return (
+              <div key={category} className="border-2 border-black overflow-hidden bg-white">
+                <div className="bg-black text-white p-3 font-black uppercase text-xs tracking-widest flex justify-between items-center">
+                  <span>{category}</span>
+                  <span className="opacity-60">{categoryTickers.length} Assets</span>
+                </div>
+                <table className="w-full text-left font-sans text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-black uppercase text-[10px] tracking-widest font-black text-black/40">
+                      <th className="p-3 border-r-2 border-black">Ticker</th>
+                      <th className="p-3 border-r-2 border-black">Price</th>
+                      <th className="p-3 text-right">Daily Change</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-black/10">
+                    {categoryTickers.map(t => (
+                      <tr key={t.symbol} className="hover:bg-black hover:text-white group transition-none">
+                        <td className="p-3 font-black border-r-2 border-black group-hover:border-white">{t.symbol}</td>
+                        <td className="p-3 font-black border-r-2 border-black group-hover:border-white">
+                          ${typeof t.price === 'number' ? t.price.toFixed(2) : "0.00"}
+                        </td>
+                        <td className="p-3 text-right font-black">
+                          <span className={`inline-block px-2 py-0.5 border-2 border-black group-hover:border-white`}>
+                            {typeof t.change === 'number' && t.change >= 0 ? '+' : ''}
+                            {typeof t.change === 'number' ? t.change.toFixed(2) : "0.00"}%
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

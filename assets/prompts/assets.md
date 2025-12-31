@@ -21,7 +21,7 @@ Design Requirements:
 - ONLY black and white, no gradients or grays
 - Style: Brutalist, geometric, modern, professional
 - Include the text "Follow The Bill" or "FTB" as monogram
-- Incorporate subtle visual metaphor: downward arrow, chain links, or flowing path representing the investment flow
+- Incorporate subtle visual metaphor: chain links, or flowing path representing the investment flow
 - Serif typeface for the wordmark
 - Sharp, clean lines - no rounded edges
 - Should work at small sizes (favicon) and large sizes (hero)
