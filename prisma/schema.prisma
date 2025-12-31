@@ -170,3 +170,16 @@ model NewsletterSubscriber {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// Market Data Cache
+model MarketCache {
+  id        String   @id @default(cuid())
+  symbol    String
+  range     String   // YTD, 1Y, 2Y, 3Y
+  data      Json     // The full result from getStockData
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([symbol, range])
+}

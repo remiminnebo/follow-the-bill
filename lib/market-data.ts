@@ -1,4 +1,5 @@
 import YahooFinance from 'yahoo-finance2';
+import { prisma } from '@/lib/db';
 
 // Create a singleton instance for v3 with specific configuration to avoid rate limits
 const yf = new (YahooFinance as any)({
@@ -30,7 +31,37 @@ export interface StockPerformance {
   history: { date: Date; close: number }[];
 }
 
-export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | '3Y') {
+const CACHE_TTL_MS = 4 * 60 * 60 * 1000; // 4 hours
+
+export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | '3Y'): Promise<StockPerformance | null> {
+  // 1. Check DB Cache
+  try {
+    const cached = await prisma.marketCache.findUnique({
+      where: {
+        symbol_range: { symbol, range }
+      }
+    });
+
+    if (cached) {
+      const age = Date.now() - new Date(cached.updatedAt).getTime();
+      if (age < CACHE_TTL_MS) {
+        // Cache hit and fresh
+        const data = cached.data as any;
+        // Restore Date objects from strings
+        return {
+          ...data,
+          history: data.history.map((h: any) => ({
+            ...h,
+            date: new Date(h.date)
+          }))
+        };
+      }
+    }
+  } catch (error) {
+    console.error(`Cache read error for ${symbol}:`, error);
+  }
+
+  // 2. Fetch from Yahoo Finance
   const end = new Date();
   let start = new Date();
 
@@ -50,14 +81,12 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
   }
 
   try {
-    // Attempt to get historical data
     const result = await yf.historical(symbol, {
       period1: start,
       period2: end,
       interval: '1d',
     }) as any[];
 
-    // Attempt to get current quote
     const quote = await yf.quote(symbol) as any;
 
     if (!quote || !result || result.length === 0) {
@@ -65,12 +94,34 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
       return null;
     }
 
-    return {
+    const performance: StockPerformance = {
       symbol,
       currentPrice: quote.regularMarketPrice || quote.price || 0,
       changePercent: quote.regularMarketChangePercent || quote.changePercent || 0,
       history: result.map(d => ({ date: d.date, close: d.close })),
     };
+
+    // 3. Update Cache
+    try {
+      await prisma.marketCache.upsert({
+        where: {
+          symbol_range: { symbol, range }
+        },
+        update: {
+          data: performance as any,
+          updatedAt: new Date()
+        },
+        create: {
+          symbol,
+          range,
+          data: performance as any
+        }
+      });
+    } catch (cacheError) {
+      console.error(`Cache write error for ${symbol}:`, cacheError);
+    }
+
+    return performance;
   } catch (error: any) {
     console.error(`Error fetching data for ${symbol}: ${error.message}`);
     return null;
