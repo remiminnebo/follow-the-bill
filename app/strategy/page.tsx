@@ -1,15 +1,12 @@
 import { Metadata } from "next";
 import { Header, Footer } from "@/components/layout";
 import { InvestmentFlow } from "@/components/home";
-import { PerformanceChart } from "@/components/strategy/performance-chart";
 import {
-    TrendingUp,
     Search,
     Target,
     BarChart3,
     Lightbulb,
     ArrowDown,
-    LineChart,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -246,22 +243,6 @@ export default function StrategyPage() {
                                 </div>
                             ))}
                         </div>
-                    </div>
-                </section>
-
-                {/* Performance Analysis */}
-                <section className="border-b-2 border-black bg-gray-50">
-                    <div className="section-container py-16 md:py-24">
-                        <div className="text-center mb-12">
-                            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center gap-3">
-                                <LineChart className="h-10 w-10" />
-                                Strategy Performance
-                            </h2>
-                            <p className="font-sans text-lg text-black/60 max-w-2xl mx-auto">
-                                Backtesting our methodology against the market. We track an aggregate index of all 20+ companies identified in our supply chain deep dive.
-                            </p>
-                        </div>
-                        <PerformanceChart />
                     </div>
                 </section>
 
