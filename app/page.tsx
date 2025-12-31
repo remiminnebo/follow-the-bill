@@ -17,11 +17,11 @@ export default function HomePage() {
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex justify-center mb-8">
                 <Image
-                  src="/landing.png"
-                  alt="Follow The Bill Logo"
+                  src="/lander.webp"
+                  alt="Follow The Bill Lander"
                   width={576}
                   height={218}
-                  className="w-full max-w-[400px] h-auto"
+                  className="w-full max-w-[500px] h-auto"
                   priority
                   unoptimized
                 />
@@ -30,9 +30,10 @@ export default function HomePage() {
                 Follow The Bill
               </h1>
               <p className="font-sans text-xl md:text-2xl text-black/80 mb-8 leading-relaxed">
-                Track AI ecosystem investments from top-level companies down to
-                fundamental resources. Understand where the money flows—from
-                artificial intelligence to uranium mining.
+                “Follow The Bill” is a methodology for understanding investment
+                opportunities by tracing capital flows through the AI ecosystem.
+                When billions flow into AI development, we ask: where does that
+                money ultimately go?
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/strategy">
