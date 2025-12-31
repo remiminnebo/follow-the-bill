@@ -45,7 +45,7 @@ export async function subscribeToNewsletter(formData: FormData) {
 
                 // Send welcome email (again)
                 await resend.emails.send({
-                    from: 'Follow The Bill <onboarding@resend.dev>', // Update this with your verified domain
+                    from: 'Follow The Bill <newsletter@minnebo.ai>',
                     to: result.data.email,
                     subject: 'Welcome back + December Report',
                     react: WelcomeEmail({ email: result.data.email }),
@@ -70,7 +70,7 @@ export async function subscribeToNewsletter(formData: FormData) {
 
         // Send welcome email
         await resend.emails.send({
-            from: 'Follow The Bill <onboarding@resend.dev>', // Update this with your verified domain
+            from: 'Follow The Bill <newsletter@minnebo.ai>',
             to: result.data.email,
             subject: 'Welcome to Follow The Bill + December Report',
             react: WelcomeEmail({ email: result.data.email }),
