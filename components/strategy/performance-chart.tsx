@@ -54,6 +54,14 @@ export function PerformanceChart() {
     );
   }
 
+  if (!data) {
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center border-2 border-black bg-white">
+        <p className="font-sans text-sm font-bold uppercase tracking-tighter">Performance data unavailable</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Metrics Grid */}
@@ -64,10 +72,10 @@ export function PerformanceChart() {
             <span className="font-sans text-xs font-bold uppercase tracking-widest">FTB Aggregate Index</span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="font-serif text-4xl font-black italic">{data?.currentValue.toFixed(2)}</span>
+            <span className="font-serif text-4xl font-black italic">{data.currentValue.toFixed(2)}</span>
             <span className="font-sans text-lg font-bold flex items-center text-black border-2 border-black px-2 py-0.5 ml-2">
-              {data && data.totalChange >= 0 ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
-              {data?.totalChange.toFixed(2)}%
+              {data.totalChange >= 0 ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
+              {data.totalChange.toFixed(2)}%
             </span>
           </div>
         </div>
