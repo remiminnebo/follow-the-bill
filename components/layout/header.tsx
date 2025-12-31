@@ -99,62 +99,81 @@ export function Header() {
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="border-2 border-black"
+                            className="border-2 border-black rounded-none h-12 w-12 hover:bg-black hover:text-white transition-colors group"
                         >
-                            <Menu className="h-6 w-6" />
+                            <div className="flex flex-col gap-1.5 justify-center items-center">
+                                <div className="h-1 w-6 bg-current transition-all group-hover:bg-white" />
+                                <div className="h-1 w-6 bg-current transition-all group-hover:bg-white" />
+                            </div>
                             <span className="sr-only">Open menu</span>
                         </Button>
                     </SheetTrigger>
                     <SheetContent
-                        side="right"
-                        className="w-full max-w-sm border-l-2 border-black bg-white"
+                        side="top"
+                        className="w-full h-full border-none bg-white p-0 flex flex-col"
                     >
-                        <SheetTitle className="font-serif text-2xl font-bold border-b-2 border-black pb-4">
-                            Menu
-                        </SheetTitle>
-                        <div className="flex flex-col gap-6 mt-8">
-                            {navigation.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="font-sans text-lg font-medium text-black hover:text-black/60 no-underline transition-colors"
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
-                            <div className="border-t-2 border-black pt-6 mt-4 flex flex-col gap-4">
-                                <SignedOut>
-                                    <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>
-                                        <Button
-                                            variant="ghost"
-                                            className="w-full font-sans border-2 border-black hover:bg-black hover:text-white transition-colors"
+                        {/* Custom Close Button - handled by Sheet internally but we can style if needed, 
+                            default Radix Close is fine, but lets make sure the Content area is immersive */}
+                        <div className="flex-1 flex flex-col pt-24 pb-12 px-8 overflow-y-auto">
+                            <div className="mb-12">
+                                <p className="font-serif text-[10px] uppercase tracking-widest font-bold mb-4 opacity-40">
+                                    Navigation
+                                </p>
+                                <div className="flex flex-col gap-4">
+                                    {navigation.map((item) => (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className="font-serif text-5xl font-black text-black no-underline hover:italic transition-all border-b-4 border-black pb-2 w-fit pr-8"
                                         >
-                                            Sign In
-                                        </Button>
-                                    </Link>
-                                    <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
-                                        <Button className="w-full font-sans bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors">
-                                            Sign Up
-                                        </Button>
-                                    </Link>
-                                </SignedOut>
-                                <SignedIn>
-                                    <div className="flex flex-col items-center gap-4">
-                                        <span className="font-sans text-lg font-medium">
-                                            {user?.fullName || user?.username}
-                                        </span>
-                                        <UserButton
-                                            afterSignOutUrl="/"
-                                            showName={false}
-                                            appearance={{
-                                                elements: {
-                                                    avatarBox: "h-16 w-16 border-2 border-black",
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </SignedIn>
+                                            {item.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="mt-auto space-y-8">
+                                <div className="flex flex-col gap-4">
+                                    <SignedOut>
+                                        <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>
+                                            <Button
+                                                variant="outline"
+                                                className="w-full h-16 font-sans text-xl font-bold border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all"
+                                            >
+                                                Sign In
+                                            </Button>
+                                        </Link>
+                                        <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
+                                            <Button className="w-full h-16 font-sans text-xl font-bold bg-black text-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(255,255,255,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all">
+                                                Sign Up
+                                            </Button>
+                                        </Link>
+                                    </SignedOut>
+                                    <SignedIn>
+                                        <div className="border-4 border-black p-6 flex items-center justify-between">
+                                            <div>
+                                                <p className="font-sans text-sm opacity-40 uppercase font-bold tracking-tighter">Authenticated As</p>
+                                                <p className="font-serif text-2xl font-black">{user?.fullName || user?.username}</p>
+                                            </div>
+                                            <UserButton
+                                                afterSignOutUrl="/"
+                                                appearance={{
+                                                    elements: {
+                                                        avatarBox: "h-16 w-16 border-4 border-black",
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                    </SignedIn>
+                                </div>
+
+                                <div className="pt-8 border-t-2 border-black/10">
+                                    <p className="font-sans text-sm text-black/60 leading-relaxed italic">
+                                        “Follow The Bill” is a methodology for understanding investment
+                                        opportunities by tracing capital flows through the AI ecosystem.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </SheetContent>
