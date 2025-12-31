@@ -6,7 +6,7 @@ dotenv.config();
 const { STRATEGY_TICKERS, getStockData } = require('../lib/market-data');
 const { prisma } = require('../lib/db');
 
-const RANGES = ['YTD'];
+const RANGES = ['YTD', '1Y', '2Y', '3Y'];
 
 async function hydrate() {
   console.log(`🚀 Starting hydration for ${STRATEGY_TICKERS.length} tickers and ${RANGES.length} ranges...`);

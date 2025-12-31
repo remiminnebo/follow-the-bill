@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { Header, Footer } from "@/components/layout";
 import { PerformanceChart } from "@/components/strategy/performance-chart";
 import { LineChart } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
     title: "Performance",
@@ -9,7 +11,13 @@ export const metadata: Metadata = {
         "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
 };
 
-export default function PerformancePage() {
+export default async function PerformancePage() {
+    const { userId } = await auth();
+
+    if (!userId) {
+        redirect("/sign-in?redirect_url=/performance");
+    }
+
     return (
         <div className="min-h-screen flex flex-col">
             <Header />

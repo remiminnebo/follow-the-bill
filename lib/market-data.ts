@@ -15,13 +15,18 @@ if ((yf as any)._env) {
   (yf as any)._env.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 }
 
-// Tickers from Strategy Deep Dive
+// Tickers from Strategy Deep Dive + XAIX, SMH, NUKL ETFs
 export const STRATEGY_TICKERS = [
-  'MSFT', 'GOOGL', 'AMZN', 'META', // Level 1: AI & Cloud
-  'NVDA', 'TSM', 'AMD', 'AVGO', 'ASML', // Level 2: Semiconductors
-  'EQIX', 'DLR', 'VRT', 'SBGSY', // Level 3: Infrastructure
-  'VST', 'CEG', 'NRG', 'NEE', // Level 4: Energy
-  'CCJ', 'KAP.L', 'MP', 'FCX' // Level 5: Resources
+  // AI & Cloud (Level 1 / XAIX)
+  'MSFT', 'GOOGL', 'AMZN', 'META', 'PLTR', 'SNOW', 'CRWD', 'MDB', 'DDOG', 'NET', 'TEAM', 'PATH',
+  // Semiconductors (Level 2 / SMH)
+  'NVDA', 'TSM', 'AMD', 'AVGO', 'ASML', 'QCOM', 'MU', 'AMAT', 'LRCX', 'ADI', 'TXN', 'INTC', 'ARM',
+  // Infrastructure & Cooling (Level 3)
+  'EQIX', 'DLR', 'VRT', 'SBGSY', 'STK', 'ETN',
+  // Energy & Nuclear (Level 4 / NUKL)
+  'VST', 'CEG', 'NRG', 'NEE', 'OKLO', 'SMR', 'BWXT', 'TLN',
+  // Resources (Level 5 / NUKL)
+  'CCJ', 'KAP.L', 'MP', 'FCX', 'UUUU', 'NXE', 'DNN', 'URA'
 ];
 
 export interface StockPerformance {
