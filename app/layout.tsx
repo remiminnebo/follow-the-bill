@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | Follow The Bill",
   },
   description:
-    "Track AI ecosystem investments from top-level companies down to fundamental resources like uranium mining and power generation. Strategic investment insights for the modern investor.",
+    "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
   keywords: [
     "AI investments",
     "investment tracking",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Follow The Bill | Strategic Investment Tracking",
     description:
-      "Track AI ecosystem investments from top-level companies down to fundamental resources.",
+      "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem.",
     url: "https://followthebill.com",
     siteName: "Follow The Bill",
     locale: "en_US",
@@ -48,11 +48,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Follow The Bill | Strategic Investment Tracking",
     description:
-      "Track AI ecosystem investments from top-level companies down to fundamental resources.",
+      "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem.",
   },
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.png",
+    apple: "/icon.png",
   },
 };
 

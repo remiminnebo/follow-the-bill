@@ -1,8 +1,17 @@
-import Link from "next/link";
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Calendar, FileText } from "lucide-react";
+import { Download, Calendar, Lock } from "lucide-react";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogDescription,
+} from "@/components/ui/dialog";
 
 interface Report {
     id: string;
@@ -19,53 +28,81 @@ interface ReportCardProps {
 }
 
 export function ReportCard({ report }: ReportCardProps) {
+    const DownloadButton = (
+        <Button
+            variant="outline"
+            className="w-full font-sans border-2 border-current bg-transparent hover:bg-white hover:text-black group-hover:border-white transition-colors rounded-none h-12"
+        >
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF
+        </Button>
+    );
+
     return (
         <Card className="border-2 border-black bg-white rounded-none shadow-none hover:bg-black hover:text-white transition-colors group h-full flex flex-col">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 text-inherit">
                 <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2 text-current opacity-60 group-hover:opacity-80">
                         <Calendar className="h-4 w-4" />
                         <span className="font-sans text-sm">{report.publishedAt}</span>
                     </div>
-                    {report.isFree ? (
-                        <Badge
-                            variant="outline"
-                            className="font-sans text-xs border-current rounded-none"
-                        >
-                            Free
-                        </Badge>
-                    ) : (
-                        <Badge
-                            variant="outline"
-                            className="font-sans text-xs border-current rounded-none"
-                        >
-                            Subscriber
-                        </Badge>
-                    )}
+                    <Badge
+                        variant="outline"
+                        className={`font-sans text-xs border-current rounded-none ${report.isFree ? "" : "bg-black text-white group-hover:bg-white group-hover:text-black"
+                            }`}
+                    >
+                        {report.isFree ? "Free" : "Subscriber"}
+                    </Badge>
                 </div>
                 <CardTitle className="font-serif text-xl font-bold leading-tight">
                     {report.title}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col flex-1">
+            <CardContent className="flex flex-col flex-1 text-inherit">
                 <p className="font-sans text-sm opacity-80 mb-4 flex-1 line-clamp-3">
                     {report.description}
                 </p>
                 <div className="flex items-center gap-2 mt-auto">
-                    <span className="font-sans text-xs border border-current px-2 py-1">
+                    <span className="font-sans text-[10px] uppercase font-bold tracking-tight border border-current px-2 py-1">
                         {report.category}
                     </span>
                 </div>
-                <div className="mt-4 pt-4 border-t border-current/20">
-                    <a href={report.fileUrl} download className="block">
-                        <Button
-                            variant="outline"
-                            className="w-full font-sans border-2 border-current bg-transparent hover:bg-white hover:text-black group-hover:border-white transition-colors rounded-none"
-                        >
-                            <Download className="h-4 w-4 mr-2" />
-                            Download PDF
-                        </Button>
-                    </a>
+                <div className="mt-6 pt-4 border-t border-current/20">
+                    {report.isFree ? (
+                        <a href={report.fileUrl} download className="block no-underline">
+                            {DownloadButton}
+                        </a>
+                    ) : (
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                {DownloadButton}
+                            </DialogTrigger>
+                            <DialogContent className="border-2 border-black rounded-none bg-white p-0 sm:max-w-[400px]">
+                                <DialogHeader className="p-8 text-center bg-black text-white">
+                                    <div className="mx-auto bg-white/20 p-4 rounded-full w-fit mb-4">
+                                        <Lock className="h-8 w-8 text-white" />
+                                    </div>
+                                    <DialogTitle className="font-serif text-2xl font-bold mb-2">
+                                        Subscription Required
+                                    </DialogTitle>
+                                    <DialogDescription className="text-white/60 font-sans">
+                                        No permission unless subscribed. Access to premium research is restricted.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="p-8 space-y-4">
+                                    <p className="font-sans text-center text-black/80">
+                                        This report is part of our premium archival research. Subscribe to unlock our full methodology and all historical reports.
+                                    </p>
+                                    <Button className="w-full bg-black text-white hover:bg-white hover:text-black border-2 border-black rounded-none h-12 font-bold transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none translate-x-[-2px] translate-y-[-2px] hover:translate-x-0 hover:translate-y-0">
+                                        Subscribe Now
+                                    </Button>
+                                    <p className="text-[10px] text-center text-black/40 uppercase font-bold tracking-widest">
+                                        Follow The Bill • methodology
+                                    </p>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    )}
                 </div>
             </CardContent>
         </Card>
