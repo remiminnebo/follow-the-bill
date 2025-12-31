@@ -39,12 +39,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Follow The Bill | Strategic Investment Tracking",
     description:
-      "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem.",
+      "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
     images: [
       {
         url: "/og-image.png",
-        width: 800,
-        height: 800,
+        width: 1200,
+        height: 630,
         alt: "Follow The Bill",
       },
     ],
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Follow The Bill | Strategic Investment Tracking",
     description:
-      "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem.",
+      "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
     images: ["/og-image.png"],
   },
   robots: {

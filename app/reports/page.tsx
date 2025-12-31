@@ -7,7 +7,7 @@ import { getReports } from "@/lib/actions/reports";
 export const metadata: Metadata = {
     title: "Reports",
     description:
-        "Access monthly investment research reports tracking AI ecosystem investments from tech giants to fundamental resources.",
+        "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
 };
 
 const categories = [

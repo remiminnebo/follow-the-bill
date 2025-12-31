@@ -18,7 +18,7 @@ import { SignedIn } from "@clerk/nextjs";
 export const metadata: Metadata = {
     title: "Forum",
     description:
-        "Join discussions with strategic investors. Share insights on AI investments, energy markets, and supply chain analysis.",
+        "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
 };
 
 const categories = [

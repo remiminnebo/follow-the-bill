@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
     title: "Strategy",
     description:
-        "Learn about the Follow The Bill investment tracking methodology. Understand how we trace capital flows from AI companies to fundamental resources.",
+        "“Follow The Bill” is a methodology for understanding investment opportunities by tracing capital flows through the AI ecosystem. When billions flow into AI development, we ask: where does that money ultimately go?",
 };
 
 const strategyPillars = [
