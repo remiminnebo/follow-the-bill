@@ -90,7 +90,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className={`${playfairDisplay.variable} ${inter.variable}`}>
-        <body className="font-sans antialiased bg-white text-black min-h-screen">
+        <body className="font-sans antialiased bg-white text-black min-h-screen" suppressHydrationWarning>
           {children}
           <Toaster position="bottom-right" />
         </body>

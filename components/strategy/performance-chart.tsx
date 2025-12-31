@@ -27,8 +27,10 @@ export function PerformanceChart() {
   const [data, setData] = useState<PerformanceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    setHasMounted(true);
     async function fetchData() {
       setLoading(true);
       setError(null);
@@ -156,50 +158,52 @@ export function PerformanceChart() {
           <p className="font-sans text-xs font-bold mt-1 text-black uppercase tracking-tight">Base 100 normalization / Strategy constituents index</p>
         </div>
         <div className="w-full h-[320px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data?.history}>
-              <defs>
-                <pattern id="pattern-stripe" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                  <rect width="2" height="4" transform="translate(0,0)" fill="black" opacity="0.1"></rect>
-                </pattern>
-              </defs>
-              <CartesianGrid strokeDasharray="0" vertical={false} stroke="#000" strokeOpacity={0.1} />
-              <XAxis 
-                dataKey="date" 
-                axisLine={{ stroke: '#000', strokeWidth: 2 }}
-                tickLine={{ stroke: '#000', strokeWidth: 2 }}
-                tick={{ fontSize: 10, fontWeight: '900', fill: '#000', fontFamily: 'var(--font-sans)' }}
-                minTickGap={30}
-              />
-              <YAxis 
-                domain={['auto', 'auto']}
-                axisLine={{ stroke: '#000', strokeWidth: 2 }}
-                tickLine={{ stroke: '#000', strokeWidth: 2 }}
-                tick={{ fontSize: 10, fontWeight: '900', fill: '#000', fontFamily: 'var(--font-sans)' }}
-              />
-              <Tooltip 
-                contentStyle={{ 
-                  border: '2px solid black', 
-                  borderRadius: 0, 
-                  backgroundColor: 'white',
-                  fontFamily: 'var(--font-sans)', 
-                  fontWeight: '900',
-                  textTransform: 'uppercase'
-                }}
-                itemStyle={{ color: 'black' }}
-                cursor={{ stroke: 'black', strokeWidth: 2 }}
-              />
-              <Area 
-                type="stepAfter" 
-                dataKey="value" 
-                stroke="#000" 
-                strokeWidth={4}
-                fill="url(#pattern-stripe)" 
-                fillOpacity={1}
-                animationDuration={0}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          {hasMounted && (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data?.history}>
+                <defs>
+                  <pattern id="pattern-stripe" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <rect width="2" height="4" transform="translate(0,0)" fill="black" opacity="0.1"></rect>
+                  </pattern>
+                </defs>
+                <CartesianGrid strokeDasharray="0" vertical={false} stroke="#000" strokeOpacity={0.1} />
+                <XAxis 
+                  dataKey="date" 
+                  axisLine={{ stroke: '#000', strokeWidth: 2 }}
+                  tickLine={{ stroke: '#000', strokeWidth: 2 }}
+                  tick={{ fontSize: 10, fontWeight: '900', fill: '#000', fontFamily: 'var(--font-sans)' }}
+                  minTickGap={30}
+                />
+                <YAxis 
+                  domain={['auto', 'auto']}
+                  axisLine={{ stroke: '#000', strokeWidth: 2 }}
+                  tickLine={{ stroke: '#000', strokeWidth: 2 }}
+                  tick={{ fontSize: 10, fontWeight: '900', fill: '#000', fontFamily: 'var(--font-sans)' }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    border: '2px solid black', 
+                    borderRadius: 0, 
+                    backgroundColor: 'white',
+                    fontFamily: 'var(--font-sans)', 
+                    fontWeight: '900',
+                    textTransform: 'uppercase'
+                  }}
+                  itemStyle={{ color: 'black' }}
+                  cursor={{ stroke: 'black', strokeWidth: 2 }}
+                />
+                <Area 
+                  type="stepAfter" 
+                  dataKey="value" 
+                  stroke="#000" 
+                  strokeWidth={4}
+                  fill="url(#pattern-stripe)" 
+                  fillOpacity={1}
+                  animationDuration={0}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
