@@ -37,12 +37,13 @@ export function Header() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center no-underline">
                     <Image
-                        src="/logo.svg"
+                        src="/logo.png"
                         alt="Follow The Bill"
                         width={576}
                         height={295}
                         className="h-20 w-auto"
                         priority
+                        unoptimized
                     />
                 </Link>
 
