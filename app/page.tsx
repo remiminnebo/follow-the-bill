@@ -23,7 +23,7 @@ export default function HomePage() {
                   height={218}
                   className="w-full max-w-[500px] h-auto"
                   priority
-                  unoptimized
+                  sizes="(max-width: 500px) 100vw, 500px"
                 />
               </div>
               <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">

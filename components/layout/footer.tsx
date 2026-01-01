@@ -36,12 +36,11 @@ export function Footer() {
                     <div className="lg:col-span-2">
                         <Link href="/" className="flex items-center no-underline mb-4">
                             <Image
-                                src="/logo.png"
+                                src="/logo.svg"
                                 alt="Follow The Bill"
                                 width={576}
                                 height={295}
                                 className="h-10 w-auto"
-                                unoptimized
                             />
                         </Link>
                         <p className="font-sans text-sm text-black/60 max-w-sm mb-6">

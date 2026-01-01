@@ -25,12 +25,11 @@ export default function AuthLayout({
                         {/* Logo */}
                         <Link href="/" className="inline-block mb-12">
                             <Image
-                                src="/logo.png"
+                                src="/logo.svg"
                                 alt="Follow The Bill"
                                 width={576}
                                 height={295}
                                 className="h-16 w-auto"
-                                unoptimized
                             />
                         </Link>
                         {children}
