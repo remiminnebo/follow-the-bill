@@ -17,7 +17,11 @@ export async function GET(request: NextRequest) {
       // Don't return 500 if we just didn't find data, return empty state
     }
 
-    return NextResponse.json(performance);
+    return NextResponse.json(performance, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (error: any) {
     console.error('API Route Error:', error.message);
     return NextResponse.json({ error: 'Internal server error', details: error.message }, { status: 500 });

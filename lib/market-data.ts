@@ -150,17 +150,67 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
 }
 
 export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y') {
-  console.log(`Starting aggregate performance fetch for range: ${range}`);
+  console.log(`Starting optimized aggregate performance fetch for range: ${range}`);
   
-  // Fetch data for all tickers
-  const promises = STRATEGY_TICKERS.map(ticker => getStockData(ticker, range));
-  const results = await Promise.all(promises);
-  const validResults = results.filter((r): r is StockPerformance => r !== null);
+  // 1. Bulk fetch all cached data for this range
+  const cachedRecords = await prisma.marketCache.findMany({
+    where: {
+      range,
+      symbol: { in: STRATEGY_TICKERS }
+    }
+  });
 
-  console.log(`Successfully fetched ${validResults.length}/${STRATEGY_TICKERS.length} tickers`);
+  const now = Date.now();
+  const validResults: StockPerformance[] = [];
+  const symbolsToFetch: string[] = [];
+
+  // 2. Identify what's fresh and what needs updating
+  const cachedMap = new Map(cachedRecords.map(r => [r.symbol, r]));
+
+  STRATEGY_TICKERS.forEach(symbol => {
+    const cached = cachedMap.get(symbol);
+    if (cached) {
+      const age = now - new Date(cached.updatedAt).getTime();
+      const data = cached.data as any;
+      const performance = {
+        ...data,
+        history: data.history.map((h: any) => ({
+          ...h,
+          date: new Date(h.date)
+        }))
+      };
+
+      if (age < CACHE_TTL_MS) {
+        validResults.push(performance);
+      } else {
+        // Stale, but use as fallback
+        validResults.push(performance);
+        symbolsToFetch.push(symbol);
+      }
+    } else {
+      symbolsToFetch.push(symbol);
+    }
+  });
+
+  // 3. If we have symbols to fetch, we'll fetch a FEW of them to avoid blocking too long
+  // In a real production app, this would be a background job.
+  // For now, if we have at least 80% of the data, we serve it and don't block.
+  if (symbolsToFetch.length > 0 && (validResults.length / STRATEGY_TICKERS.length) < 0.8) {
+    console.log(`Too many missing/stale tickers (${symbolsToFetch.length}), fetching synchronously...`);
+    const newResults = await Promise.all(
+      symbolsToFetch.slice(0, 5).map(s => getStockData(s, range))
+    );
+    newResults.forEach(r => {
+      if (r) {
+        // Replace or add
+        const idx = validResults.findIndex(v => v.symbol === r.symbol);
+        if (idx > -1) validResults[idx] = r;
+        else validResults.push(r);
+      }
+    });
+  }
 
   if (validResults.length === 0) {
-    console.error("All ticker fetches failed. Returning default state.");
     return {
       tickers: [],
       history: [],
@@ -170,20 +220,14 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
     };
   }
 
-  // Normalize history data to index 100 starting at 'start'
+  // 4. Normalize and Aggregate (same logic as before)
   const aggregateMap: Map<string, number> = new Map();
   const dateCounts: Map<string, number> = new Map();
-
   const stocksWithHistory = validResults.filter(s => s.history && s.history.length > 0);
   
   if (stocksWithHistory.length === 0) {
-    console.error("No stocks with history found.");
     return {
-      tickers: validResults.map(r => ({
-        symbol: r.symbol,
-        price: r.currentPrice,
-        change: r.changePercent
-      })),
+      tickers: validResults.map(r => ({ symbol: r.symbol, price: r.currentPrice, change: r.changePercent })),
       history: [],
       currentValue: 100,
       startValue: 100,
@@ -194,11 +238,9 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
   stocksWithHistory.forEach(stock => {
     const initialPrice = stock.history[0].close;
     if (!initialPrice || initialPrice === 0) return;
-    
     stock.history.forEach(day => {
       const dateStr = day.date.toISOString().split('T')[0];
       const normalizedPrice = (day.close / initialPrice) * 100;
-      
       aggregateMap.set(dateStr, (aggregateMap.get(dateStr) || 0) + normalizedPrice);
       dateCounts.set(dateStr, (dateCounts.get(dateStr) || 0) + 1);
     });
@@ -211,25 +253,9 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  if (aggregateHistory.length === 0) {
-    return {
-      tickers: validResults.map(r => ({
-        symbol: r.symbol,
-        price: r.currentPrice,
-        change: r.changePercent
-      })),
-      history: [],
-      currentValue: 100,
-      startValue: 100,
-      totalChange: 0
-    };
-  }
-
   return {
     tickers: validResults.map(r => ({
-      symbol: r.symbol,
-      price: r.currentPrice,
-      change: r.changePercent
+      symbol: r.symbol, price: r.currentPrice, change: r.changePercent
     })),
     history: aggregateHistory,
     currentValue: aggregateHistory[aggregateHistory.length - 1]?.value || 100,
