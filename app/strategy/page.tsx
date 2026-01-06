@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Header, Footer } from "@/components/layout";
 import { InvestmentFlow } from "@/components/home";
+import { EcosystemSelector } from "@/components/strategy/ecosystem-selector";
 import {
     Search,
     Target,
@@ -108,12 +109,19 @@ export default function StrategyPage() {
             <Header />
 
             <main className="flex-1 pt-[96px]">
+                {/* Ecosystem Selector */}
+                <section className="border-b-2 border-black bg-white">
+                    <div className="section-container py-6">
+                        <EcosystemSelector current="ai" />
+                    </div>
+                </section>
+
                 {/* Hero */}
                 <section className="border-b-2 border-black">
                     <div className="section-container py-16 md:py-24">
                         <div className="max-w-4xl mx-auto">
                             <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6">
-                                Our Strategy
+                                AI Ecosystem Strategy
                             </h1>
                             <p className="font-sans text-xl text-black/80 leading-relaxed">
                                 &ldquo;Follow The Bill&rdquo; is a methodology for understanding
@@ -242,6 +250,23 @@ export default function StrategyPage() {
                                     )}
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* CTA to Robotics Strategy */}
+                <section className="border-b-2 border-black bg-white">
+                    <div className="section-container py-16">
+                        <div className="text-center">
+                            <h3 className="font-serif text-2xl font-bold mb-4">
+                                Explore Our Robotics Thesis
+                            </h3>
+                            <p className="font-sans text-black/60 mb-6 max-w-xl mx-auto">
+                                Our Robotics Ecosystem strategy tracks humanoid robots, industrial automation, and the Japan-based manufacturers powering the automation revolution.
+                            </p>
+                            <a href="/strategy/robotics" className="inline-block bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors font-sans px-8 py-4 font-medium">
+                                View Robotics Strategy →
+                            </a>
                         </div>
                     </div>
                 </section>

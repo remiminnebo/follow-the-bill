@@ -47,17 +47,17 @@ export default function AuthLayout({
 
                 <div className="relative z-10 max-w-md">
                     <h2 className="font-serif text-4xl lg:text-5xl font-bold mb-8 leading-tight">
-                        Follow the money from AI to atoms.
+                        Follow the money from AI &amp; Robotics to atoms.
                     </h2>
                     <div className="space-y-6">
                         <p className="font-sans text-lg text-white/80 border-l-2 border-white pl-6 py-2">
-                            Access exclusive research reports tracking the AI supply chain.
+                            Access educational research tracking AI and Robotics supply chains.
                         </p>
                         <p className="font-sans text-lg text-white/80 border-l-2 border-white pl-6 py-2">
-                            Join discussions with a community of strategic investors.
+                            Join discussions exploring investment theses with our community.
                         </p>
                         <p className="font-sans text-lg text-white/80 border-l-2 border-white pl-6 py-2">
-                            Get real-time insights into energy and infrastructure markets.
+                            Global coverage: US, Japan, and China markets.
                         </p>
                     </div>
                 </div>

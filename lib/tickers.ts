@@ -1,4 +1,8 @@
-// Tickers categorized by Supply Chain Level
+// Ecosystem Types for switching between AI and Robotics views
+export type Ecosystem = 'ai' | 'robotics' | 'combined';
+
+// AI Strategy Categories - Educational investment thesis
+// NOTE: This is not an actual ETF - purely educational research
 export const STRATEGY_CATEGORIES = {
   "AI & Cloud": ['MSFT', 'GOOGL', 'AMZN', 'META', 'PLTR', 'SNOW', 'CRWD', 'MDB', 'DDOG', 'NET', 'TEAM', 'PATH'],
   "Semiconductors": ['NVDA', 'TSM', 'AMD', 'AVGO', 'ASML', 'QCOM', 'MU', 'AMAT', 'LRCX', 'ADI', 'TXN', 'INTC', 'ARM'],

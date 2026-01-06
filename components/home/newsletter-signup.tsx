@@ -37,7 +37,7 @@ export function NewsletterSignup() {
                 Subscribe to Monthly Insights
             </h3>
             <p className="font-sans text-sm text-black/60 mb-6 text-center">
-                Get our exclusive investment reports delivered directly to your inbox.
+                Get exclusive AI and Robotics ecosystem investment reports delivered to your inbox.
             </p>
 
             <form onSubmit={handleSubmit} className="flex gap-0">

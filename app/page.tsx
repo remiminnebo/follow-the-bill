@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Header, Footer } from "@/components/layout";
-import { InvestmentFlow, NewsletterSignup, LatestReport, SignUpCTA } from "@/components/home";
+import { InvestmentFlow, RoboticsInvestmentFlow, NewsletterSignup, LatestReport, SignUpCTA } from "@/components/home";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, TrendingUp, Shield, Users } from "lucide-react";
+import { ArrowRight, TrendingUp, Shield, Users, Brain, Bot } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -30,25 +30,59 @@ export default function HomePage() {
                 Follow The Bill
               </h1>
               <p className="font-sans text-xl md:text-2xl text-black/80 mb-8 leading-relaxed">
-                “Follow The Bill” is a methodology for understanding investment
-                opportunities by tracing capital flows through the AI ecosystem.
-                When billions flow into AI development, we ask: where does that
-                money ultimately go?
+                A methodology for understanding investment opportunities by tracing
+                capital flows through the <strong>AI</strong> and <strong>Robotics</strong> ecosystems.
+                When billions flow into these technologies, we ask: where does that money ultimately go?
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/strategy">
                   <Button className="w-full sm:w-auto bg-black text-white border-2 border-black hover:bg-white hover:text-black transition-colors rounded-none font-sans text-lg px-8 py-6">
-                    Learn Our Strategy
-                    <ArrowRight className="h-5 w-5 ml-2" />
+                    <Brain className="h-5 w-5 mr-2" />
+                    AI Strategy
                   </Button>
                 </Link>
-                <Link href="/reports">
+                <Link href="/strategy/robotics">
                   <Button
                     variant="outline"
                     className="w-full sm:w-auto border-2 border-black text-black bg-white hover:bg-black hover:text-white transition-colors rounded-none font-sans text-lg px-8 py-6"
                   >
-                    View Reports
+                    <Bot className="h-5 w-5 mr-2" />
+                    Robotics Strategy
                   </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Two Ecosystems */}
+        <section className="border-b-2 border-black bg-black text-white">
+          <div className="section-container py-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x-2 divide-white/20">
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Brain className="h-8 w-8" />
+                  <h3 className="font-serif text-2xl font-bold">AI Ecosystem</h3>
+                </div>
+                <p className="font-sans text-sm text-white/80 mb-4">
+                  From cloud providers and AI companies through semiconductors,
+                  data centers, energy, and fundamental resources.
+                </p>
+                <Link href="/strategy" className="font-sans text-sm font-bold border-b border-white/50 hover:border-white pb-1">
+                  Explore AI Strategy →
+                </Link>
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Bot className="h-8 w-8" />
+                  <h3 className="font-serif text-2xl font-bold">Robotics Ecosystem</h3>
+                </div>
+                <p className="font-sans text-sm text-white/80 mb-4">
+                  Global robotics leaders from US, Japan, and China—humanoid robots,
+                  industrial automation, sensors, and shared infrastructure.
+                </p>
+                <Link href="/strategy/robotics" className="font-sans text-sm font-bold border-b border-white/50 hover:border-white pb-1">
+                  Explore Robotics Strategy →
                 </Link>
               </div>
             </div>
@@ -56,25 +90,25 @@ export default function HomePage() {
         </section>
 
         {/* Value Propositions */}
-        <section className="border-b-2 border-black bg-black text-white">
+        <section className="border-b-2 border-black">
           <div className="section-container py-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x-2 divide-white/20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x-2 divide-black/20">
               <div className="p-8 text-center">
                 <TrendingUp className="h-8 w-8 mx-auto mb-4" />
                 <h3 className="font-serif text-xl font-bold mb-2">
-                  Strategic Analysis
+                  Dual Ecosystem Analysis
                 </h3>
-                <p className="font-sans text-sm text-white/80">
-                  Deep-dive research into the full AI investment supply chain
+                <p className="font-sans text-sm text-black/80">
+                  Deep-dive research into AI and Robotics supply chains with shared infrastructure insights
                 </p>
               </div>
               <div className="p-8 text-center">
                 <Shield className="h-8 w-8 mx-auto mb-4" />
                 <h3 className="font-serif text-xl font-bold mb-2">
-                  Independent Research
+                  Global Coverage
                 </h3>
-                <p className="font-sans text-sm text-white/80">
-                  Non-profit, unbiased analysis without conflicts of interest
+                <p className="font-sans text-sm text-black/80">
+                  Stocks from US, Japan, China, and Europe—covering all major robotics and AI markets
                 </p>
               </div>
               <div className="p-8 text-center">
@@ -82,7 +116,7 @@ export default function HomePage() {
                 <h3 className="font-serif text-xl font-bold mb-2">
                   Community Driven
                 </h3>
-                <p className="font-sans text-sm text-white/80">
+                <p className="font-sans text-sm text-black/80">
                   Join discussions with like-minded strategic investors
                 </p>
               </div>
@@ -90,19 +124,32 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Investment Flow Diagram */}
+        {/* Investment Flow Diagrams - Side by Side */}
         <section className="border-b-2 border-black">
           <div className="section-container py-16 md:py-24">
             <div className="text-center mb-12">
               <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4">
-                The Investment Chain
+                Two Investment Chains
               </h2>
               <p className="font-sans text-lg text-black/60 max-w-2xl mx-auto">
-                Understanding how capital flows through the AI ecosystem—from
-                tech giants to the fundamental resources that power them.
+                Understanding how capital flows through both ecosystems—with shared
+                infrastructure at the foundation.
               </p>
             </div>
-            <InvestmentFlow />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <h3 className="font-serif text-xl font-bold mb-6 text-center flex items-center justify-center gap-2">
+                  <Brain className="h-5 w-5" /> AI Ecosystem
+                </h3>
+                <InvestmentFlow />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-bold mb-6 text-center flex items-center justify-center gap-2">
+                  <Bot className="h-5 w-5" /> Robotics Ecosystem
+                </h3>
+                <RoboticsInvestmentFlow />
+              </div>
+            </div>
           </div>
         </section>
 
@@ -114,7 +161,7 @@ export default function HomePage() {
                 Latest Report
               </h2>
               <p className="font-sans text-lg text-black/60 max-w-2xl mx-auto">
-                Our most recent analysis of AI ecosystem investments.
+                Our most recent analysis covering both AI and Robotics ecosystem investments.
               </p>
             </div>
             <LatestReport />
@@ -135,10 +182,13 @@ export default function HomePage() {
               Ready to Follow The Bill?
             </h2>
             <p className="font-sans text-lg text-white/80 max-w-2xl mx-auto mb-8">
-              Join our community of strategic investors and gain access to
-              exclusive research, monthly reports, and discussion forums.
+              Join our educational community exploring AI and Robotics investment theses.
+              Access research reports, discussion forums, and strategic analysis.
             </p>
             <SignUpCTA />
+            <p className="font-sans text-xs text-white/50 mt-6 max-w-lg mx-auto">
+              This is an educational non-profit. We do not offer financial advice or manage investments.
+            </p>
           </div>
         </section>
       </main>

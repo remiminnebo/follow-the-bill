@@ -3,10 +3,11 @@ import Image from "next/image";
 import { Mail, Github, Twitter, Linkedin } from "lucide-react";
 
 const footerLinks = {
-    company: [
-        { name: "About", href: "/about" },
-        { name: "Strategy", href: "/strategy" },
-        { name: "Contact", href: "/contact" },
+    ecosystems: [
+        { name: "AI Strategy", href: "/strategy" },
+        { name: "Robotics Strategy", href: "/strategy/robotics" },
+        { name: "AI Performance", href: "/performance" },
+        { name: "Robotics Performance", href: "/performance/robotics" },
     ],
     resources: [
         { name: "Reports", href: "/reports" },
@@ -45,9 +46,9 @@ export function Footer() {
                             />
                         </Link>
                         <p className="font-sans text-sm text-black/60 max-w-sm mb-6">
-                            Track AI ecosystem investments from top-level companies down to
-                            fundamental resources. Strategic investment insights for the modern
-                            investor.
+                            Track AI and Robotics ecosystem investments from global tech leaders
+                            down to fundamental resources. Dual-thesis strategic investment
+                            insights covering US, Japan, and China markets.
                         </p>
 
                         {/* Newsletter Signup */}
@@ -68,13 +69,13 @@ export function Footer() {
                         </div>
                     </div>
 
-                    {/* Company Links */}
+                    {/* Ecosystems Links */}
                     <div>
                         <h4 className="font-serif text-lg font-bold mb-4 border-b-2 border-black pb-2">
-                            Company
+                            Ecosystems
                         </h4>
                         <ul className="space-y-3">
-                            {footerLinks.company.map((link) => (
+                            {footerLinks.ecosystems.map((link) => (
                                 <li key={link.name}>
                                     <Link
                                         href={link.href}

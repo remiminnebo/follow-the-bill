@@ -1,10 +1,11 @@
 import YahooFinance from 'yahoo-finance2';
 import { prisma } from '@/lib/db';
 import { STRATEGY_TICKERS } from './tickers';
+import { ROBOTICS_TICKERS } from './robotics-tickers';
 
 // Create a singleton instance for v3 with specific configuration to avoid rate limits
 const yf = new (YahooFinance as any)({
-  suppressNotices: ['yahooSurvey'],
+  suppressNotices: ['yahooSurvey', 'ripHistorical'],
   queue: {
     concurrency: 2, // Limit concurrent requests to avoid 429 "Too Many Requests"
     timeout: 10000
@@ -70,11 +71,23 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
 
   // 2. Fetch from Yahoo Finance
   const end = new Date();
+
+  // FIX: If the system time assumes 2026 (future), but Yahoo data is only available up to late 2025/early 2026 real time,
+  // we must clamp the start date to avoid "future" errors.
+  let currentYear = end.getFullYear();
+  if (currentYear > 2025) {
+    currentYear = 2025;
+    end.setFullYear(2025);
+    end.setMonth(11); // Dec
+    end.setDate(31);  // 31st
+  }
+
   let start = new Date();
 
   switch (range) {
     case 'YTD':
-      start = new Date(new Date().getFullYear(), 0, 1);
+      // From Jan 1 of the clamped context
+      start = new Date(currentYear, 0, 1);
       break;
     case '1Y':
       start.setFullYear(end.getFullYear() - 1);
@@ -85,6 +98,11 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
     case '3Y':
       start.setFullYear(end.getFullYear() - 3);
       break;
+  }
+
+  // Safety check: ensure start is before end
+  if (start > end) {
+    start = new Date(end.getFullYear() - 1, 0, 1); // fallback to 1 year prior if invalid
   }
 
   try {
@@ -132,7 +150,7 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
     return performance;
   } catch (error: any) {
     console.error(`Error fetching data for ${symbol}: ${error.message}`);
-    
+
     // 4. Fallback to stale cache if fetch failed
     if (cachedData) {
       console.log(`Using stale cache for ${symbol} after fetch failure.`);
@@ -144,19 +162,23 @@ export async function getStockData(symbol: string, range: 'YTD' | '1Y' | '2Y' | 
         }))
       };
     }
-    
+
     return null;
   }
 }
 
-export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y') {
-  console.log(`Starting optimized aggregate performance fetch for range: ${range}`);
-  
+export async function getAggregatePerformance(
+  range: 'YTD' | '1Y' | '2Y' | '3Y',
+  ecosystem: 'ai' | 'robotics' = 'ai'
+) {
+  const tickers = ecosystem === 'robotics' ? ROBOTICS_TICKERS : STRATEGY_TICKERS;
+  console.log(`Starting optimized aggregate performance fetch for range: ${range}, ecosystem: ${ecosystem}`);
+
   // 1. Bulk fetch all cached data for this range
   const cachedRecords = await prisma.marketCache.findMany({
     where: {
       range,
-      symbol: { in: STRATEGY_TICKERS }
+      symbol: { in: tickers }
     }
   });
 
@@ -167,7 +189,7 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
   // 2. Identify what's fresh and what needs updating
   const cachedMap = new Map(cachedRecords.map(r => [r.symbol, r]));
 
-  STRATEGY_TICKERS.forEach(symbol => {
+  tickers.forEach(symbol => {
     const cached = cachedMap.get(symbol);
     if (cached) {
       const age = now - new Date(cached.updatedAt).getTime();
@@ -195,7 +217,7 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
   // 3. If we have symbols to fetch, we'll fetch a FEW of them to avoid blocking too long
   // In a real production app, this would be a background job.
   // For now, if we have at least 80% of the data, we serve it and don't block.
-  if (symbolsToFetch.length > 0 && (validResults.length / STRATEGY_TICKERS.length) < 0.8) {
+  if (symbolsToFetch.length > 0 && (validResults.length / tickers.length) < 0.8) {
     console.log(`Too many missing/stale tickers (${symbolsToFetch.length}), fetching synchronously...`);
     const newResults = await Promise.all(
       symbolsToFetch.slice(0, 5).map(s => getStockData(s, range))
@@ -224,7 +246,7 @@ export async function getAggregatePerformance(range: 'YTD' | '1Y' | '2Y' | '3Y')
   const aggregateMap: Map<string, number> = new Map();
   const dateCounts: Map<string, number> = new Map();
   const stocksWithHistory = validResults.filter(s => s.history && s.history.length > 0);
-  
+
   if (stocksWithHistory.length === 0) {
     return {
       tickers: validResults.map(r => ({ symbol: r.symbol, price: r.currentPrice, change: r.changePercent })),

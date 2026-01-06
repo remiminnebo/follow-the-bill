@@ -1,8 +1,22 @@
 # Follow The Bill
 
-A strategic investment non-profit organization website focused on tracking AI ecosystem investments from top-level companies down to fundamental resources like uranium mining and power generation.
+A strategic investment non-profit organization website focused on tracking **AI** and **Robotics** ecosystem investments from top-level companies down to fundamental resources like uranium mining and power generation.
 
-![Homepage Preview](/assets/screenshots/homepage.png)
+## 🎯 Dual Ecosystem Approach
+
+**Follow The Bill** tracks two interconnected investment theses:
+
+### AI Ecosystem
+- AI & Cloud providers → Semiconductors → Data Centers → Energy → Resources
+
+### Robotics Ecosystem  
+- Humanoid & Industrial Robotics → Motion Control → Sensors → AI & Autonomy → Semiconductors (shared) → Energy (shared) → Resources (shared)
+
+### Global Coverage
+- 🇺🇸 **US**: NVIDIA, Tesla, Microsoft, Google, Intuitive Surgical
+- 🇯🇵 **Japan**: Fanuc, Yaskawa, Keyence, Hitachi
+- 🇨🇳 **China**: Baidu, XPeng
+- 🇪🇺 **Europe**: ABB, ASML, Siemens
 
 ## 🚀 Tech Stack
 
@@ -10,7 +24,7 @@ A strategic investment non-profit organization website focused on tracking AI ec
 - **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: NextAuth.js (prepared)
+- **Authentication**: Clerk
 - **File Storage**: Vercel Blob (for PDF reports)
 - **Language**: TypeScript
 
@@ -33,32 +47,38 @@ The website follows a **brutalist, minimalist aesthetic**:
 ```
 follow-the-bill/
 ├── app/
-│   ├── (auth)/           # Authentication pages
-│   │   ├── signin/
-│   │   └── signup/
-│   ├── (dashboard)/      # Protected user dashboard
-│   ├── strategy/         # Strategy explanation page
-│   ├── reports/          # Reports archive
-│   ├── forum/            # Community forum
-│   ├── admin/            # Admin panel
-│   ├── layout.tsx        # Root layout
-│   ├── page.tsx          # Homepage
-│   └── globals.css       # Global styles & design tokens
+│   ├── (auth)/              # Authentication pages
+│   │   ├── sign-in/
+│   │   └── sign-up/
+│   ├── (dashboard)/         # Protected user dashboard
+│   ├── strategy/            # AI Strategy page
+│   │   └── robotics/        # Robotics Strategy page
+│   ├── performance/         # AI Performance page
+│   │   └── robotics/        # Robotics Performance page
+│   ├── reports/             # Reports archive
+│   ├── forum/               # Community forum
+│   ├── layout.tsx           # Root layout
+│   ├── page.tsx             # Homepage (dual ecosystem)
+│   └── globals.css          # Global styles & design tokens
 ├── components/
-│   ├── layout/           # Header, Footer
-│   ├── home/             # Homepage components
-│   ├── reports/          # Report cards
-│   ├── forum/            # Forum components
-│   └── ui/               # shadcn/ui components
+│   ├── layout/              # Header, Footer
+│   ├── home/                # Homepage components (InvestmentFlow, RoboticsInvestmentFlow)
+│   ├── strategy/            # EcosystemSelector, PerformanceChart, RoboticsPerformanceChart
+│   ├── reports/             # Report cards
+│   ├── forum/               # Forum components
+│   └── ui/                  # shadcn/ui components
 ├── lib/
-│   ├── db.ts             # Prisma client
-│   ├── utils.ts          # Utility functions
-│   └── validations.ts    # Zod schemas
+│   ├── db.ts                # Prisma client
+│   ├── tickers.ts           # AI ETF tickers
+│   ├── robotics-tickers.ts  # Robotics ETF tickers (with Japan & China stocks)
+│   ├── market-data.ts       # Yahoo Finance integration
+│   ├── utils.ts             # Utility functions
+│   └── validations.ts       # Zod schemas
 ├── prisma/
-│   └── schema.prisma     # Database schema
+│   └── schema.prisma        # Database schema
 └── public/
-    ├── logo.svg          # Brand logo
-    └── reports/          # PDF reports
+    ├── logo.svg             # Brand logo
+    └── reports/             # PDF reports
 ```
 
 ## 🛠️ Getting Started
@@ -86,13 +106,6 @@ follow-the-bill/
    ```bash
    cp .env.example .env
    ```
-   
-   Edit `.env` with your database URL and other secrets:
-   ```env
-   DATABASE_URL="postgresql://..."
-   NEXTAUTH_SECRET="your-secret"
-   NEXTAUTH_URL="http://localhost:3000"
-   ```
 
 4. **Generate Prisma client**
    ```bash
@@ -115,12 +128,15 @@ follow-the-bill/
 
 | Route | Description |
 |-------|-------------|
-| `/` | Homepage with hero, investment flow diagram, newsletter signup |
-| `/strategy` | Detailed explanation of the "Follow The Bill" methodology |
+| `/` | Homepage with dual ecosystem overview and investment flows |
+| `/strategy` | AI Ecosystem strategy explanation |
+| `/strategy/robotics` | Robotics Ecosystem strategy explanation |
+| `/performance` | AI ETF performance tracking |
+| `/performance/robotics` | Robotics ETF performance tracking |
 | `/reports` | Archive of monthly investment reports |
 | `/forum` | Community discussion forum |
-| `/signin` | User sign-in page |
-| `/signup` | User registration page |
+| `/sign-in` | User sign-in page |
+| `/sign-up` | User registration page |
 
 ## 🗄️ Database Schema
 
@@ -132,6 +148,7 @@ The application uses the following main models:
 - **Post**: Forum threads
 - **Comment**: Forum replies
 - **Vote**: Upvote/downvote system
+- **MarketCache**: Cached stock data from Yahoo Finance
 
 ## 🚢 Deployment
 
@@ -173,4 +190,4 @@ This project is licensed under the MIT License.
 
 ---
 
-**Follow The Bill** - Track AI ecosystem investments from top-level companies down to fundamental resources.
+**Follow The Bill** - Track AI and Robotics ecosystem investments from global tech leaders to fundamental resources.
